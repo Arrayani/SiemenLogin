@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     private var auth: FirebaseAuth? = null
     private var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks? = null
 
-    private var storedVerificationId:String? =null
+    //private var storedVerificationId:String? =null
     //private var resendToken: PhoneAuthProvider.ForceResendingToken? = null
     private var mResendToken: PhoneAuthProvider.ForceResendingToken? = null
 
@@ -65,6 +65,12 @@ class MainActivity : AppCompatActivity() {
             //ketika di kirim pertama kali, mVerificationId hanya variabel string kosong
         }
 
+        val resendTokenbtn= binding.buttonResend
+        resendTokenbtn.setOnClickListener{
+            val phoneNumber = binding.fieldPhoneNumber.text
+            resendVerificationCode(phoneNumber.toString(), mResendToken)
+        }
+
 
 
 
@@ -103,7 +109,7 @@ class MainActivity : AppCompatActivity() {
                 // The SMS verification code has been sent to the provided phone number, we
                 // now need to ask the user to enter the code and then construct a credential
                 // by combining the code with a verification ID.
-                Log.d(TAG, "onCodeSent:" + verificationId!!)
+                Log.d(TAG, "onCodeSent:" + verificationId)
 
                 // Save verification ID and resending token so we can use them later
                 mVerificationId = verificationId // dari sini mVerification muncul
@@ -116,6 +122,19 @@ class MainActivity : AppCompatActivity() {
 
 
     }
+    //-------------
+    private fun resendVerificationCode(phoneNumber: String,
+                                       token: PhoneAuthProvider.ForceResendingToken?) {
+        PhoneAuthProvider.getInstance().verifyPhoneNumber(
+            phoneNumber, // Phone number to verify
+            60, // Timeout duration
+            TimeUnit.SECONDS, // Unit of timeout
+            this, // Activity (for callback binding)
+            callbacks!!, // OnVerificationStateChangedCallbacks
+            token)             // ForceResendingToken from callbacks
+    }
+
+    //---------
     //Cek phone is alright???
     private fun validatePhoneNumber(): Boolean {
         //val phoneNumber = fieldPhoneNumber.text.toString()
@@ -165,5 +184,22 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }
+    }
+    companion object {
+
+        private val TAG = "PhoneAuthActivity"
+
+        private val KEY_VERIFY_IN_PROGRESS = "key_verify_in_progress"
+    }
+
+    //inibuat ngasih tau jika proses masih bekerja
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(KEY_VERIFY_IN_PROGRESS, mVerificationInProgress)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        mVerificationInProgress = savedInstanceState.getBoolean(KEY_VERIFY_IN_PROGRESS)
     }
 }
