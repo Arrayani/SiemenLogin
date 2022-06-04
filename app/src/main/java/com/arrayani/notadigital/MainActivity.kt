@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.widget.Button
 import android.widget.Toast
 import com.arrayani.notadigital.databinding.ActivityMainBinding
 import com.google.firebase.FirebaseException
